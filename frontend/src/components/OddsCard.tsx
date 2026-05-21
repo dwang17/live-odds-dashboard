@@ -16,7 +16,7 @@ export default function OddsCard({
           )}
 
           <span className="font-semibold">
-            LIVE
+            {bet.live ? "LIVE" : "PENDING"}
           </span>
         </div>
 

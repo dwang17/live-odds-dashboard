@@ -62,6 +62,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	for {
 		data := randomOdds()
 
+		// send odds data as JSON to frontend
 		err := conn.WriteJSON(data)
 
 		if err != nil {

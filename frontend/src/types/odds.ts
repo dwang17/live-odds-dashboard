@@ -1,7 +1,10 @@
 export interface OddsBet {
-  id: number
-  player: string
-  market: string
-  odds: string
-  live: boolean
+  id: number;
+  event: string;
+  team: string;
+  bookmaker: string;
+  market: string;
+  odds: number;
+  lastUpdate: string;
+  live: boolean;
 }

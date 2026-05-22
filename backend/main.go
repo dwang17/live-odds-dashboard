@@ -1,22 +1,47 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/joho/godotenv"
 )
 
-// initialize global random number generator with current time as seed to ensure different odds each time server starts
-var r = rand.New(rand.NewSource(time.Now().UnixNano()))
-
-// create odds struct to send to frontend
 type Odds struct {
-	Player string `json:"player"`
-	Market string `json:"market"`
-	Odds   int    `json:"odds"`
+	Event      string `json:"event"`
+	Team       string `json:"team"`
+	Bookmaker  string `json:"bookmaker"`
+	Market     string `json:"market"`
+	Odds       int    `json:"odds"`
+	LastUpdate string `json:"lastUpdate"`
+}
+
+type ApiOutcome struct {
+	Name  string `json:"name"`
+	Price int    `json:"price"`
+}
+
+type ApiMarket struct {
+	Key        string       `json:"key"`
+	LastUpdate string       `json:"last_update"`
+	Outcomes   []ApiOutcome `json:"outcomes"`
+}
+
+type ApiBookmaker struct {
+	Title      string      `json:"title"`
+	LastUpdate string      `json:"last_update"`
+	Markets    []ApiMarket `json:"markets"`
+}
+
+type ApiGame struct {
+	HomeTeam   string         `json:"home_team"`
+	AwayTeam   string         `json:"away_team"`
+	Bookmakers []ApiBookmaker `json:"bookmakers"`
 }
 
 // initialize websocket upgrader to keep socket open with default options
@@ -26,25 +51,60 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-// simulate random odds to change every 3 seconds and send to frontend
-func randomOdds() []Odds {
-	return []Odds{
-		{
-			Player: "LeBron James",
-			Market: "Over 6.5 Rebounds",
-			Odds:   -230 + r.Intn(20),
-		},
-		{
-			Player: "Stephen Curry",
-			Market: "Over 5.5 Assists",
-			Odds:   -200 + r.Intn(20),
-		},
-		{
-			Player: "Alperen Sengun",
-			Market: "Over 20.5 Points",
-			Odds:   -215 + r.Intn(20),
-		},
+// sample fetch odds for now, h2h/moneyline data
+func fetchOdds() ([]Odds, error) {
+	//get API key from env file
+	apiKey := os.Getenv("ODDS_API_KEY")
+
+	//format URL with API key from env file
+	url := fmt.Sprintf(
+		"https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey=%s&regions=us&oddsFormat=american",
+		apiKey,
+	)
+
+	resp, err := http.Get(url)
+
+	if err != nil {
+		log.Println("Error fetching odds:", err)
+		return nil, err
 	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("API returned status: %s", resp.Status)
+	}
+
+	var games []ApiGame
+
+	err = json.NewDecoder(resp.Body).Decode(&games)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var odds []Odds
+
+	for _, game := range games {
+		eventName := game.AwayTeam + " @ " + game.HomeTeam
+
+		for _, bookmaker := range game.Bookmakers {
+			for _, market := range bookmaker.Markets {
+				for _, outcome := range market.Outcomes {
+					odds = append(odds, Odds{
+						Event:      eventName,
+						Team:       outcome.Name,
+						Bookmaker:  bookmaker.Title,
+						Market:     market.Key,
+						Odds:       outcome.Price,
+						LastUpdate: bookmaker.LastUpdate,
+					})
+				}
+			}
+		}
+	}
+
+	return odds, nil
 }
 
 // handle websocket connection and send random odds every 3 seconds
@@ -60,28 +120,38 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// continuously send random odds to frontend every 3 seconds until connection is closed
 	for {
-		data := randomOdds()
-
-		// send odds data as JSON to frontend
-		err := conn.WriteJSON(data)
+		data, err := fetchOdds()
 
 		if err != nil {
-			log.Println(err)
-			break
+			log.Println("Error fetching odds:", err)
+		} else {
+			//send odds data as JSON to frontend
+			err = conn.WriteJSON(data)
+
+			if err != nil {
+				log.Println(err)
+				break
+			}
 		}
 
-		time.Sleep(3 * time.Second)
+		time.Sleep(5 * time.Minute) //update live odds every 5 mins for limit purposes
 	}
 }
 
 func main() {
+	err := godotenv.Load() //load environment variables from .env file
+
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	//websocket endpoint /ws to handle connections and send odds
 	http.HandleFunc("/ws", wsHandler)
 
 	log.Println("Server running on :8080")
 
 	//start server on port 8080 and log any errors
-	err := http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServe(":8080", nil)
 
 	if err != nil {
 		log.Fatal(err)

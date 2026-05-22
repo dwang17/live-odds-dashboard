@@ -107,7 +107,7 @@ func fetchOdds() ([]Odds, error) {
 	return odds, nil
 }
 
-// handle websocket connection and send random odds every 3 seconds
+// handle websocket connection and re-poll every 5 mins
 func wsHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 
@@ -118,7 +118,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 	defer conn.Close() //run before function exits to ensure connection is closed
 
-	// continuously send random odds to frontend every 3 seconds until connection is closed
+	// continuously re-poll and send data to frontend every 5 mins until connection is closed
 	for {
 		data, err := fetchOdds()
 

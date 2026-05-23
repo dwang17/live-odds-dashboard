@@ -1,37 +1,44 @@
-import { OddsBet } from "@/types/odds"
+import { OddsBet } from "@/types/odds";
 
 interface OddsCardProps {
-  bet: OddsBet
+  bet: OddsBet;
 }
 
-export default function OddsCard({
-  bet,
-}: OddsCardProps) {
+export default function OddsCard({ bet }: OddsCardProps) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+    <div className="w-full max-w-sm rounded-3xl border-2 border-black bg-white p-6 flex flex-col gap-4">
+      <div className="flex items-center gap-2">
+        {/* live icon */}
+        {bet.live && (
+          <span className="h-3 w-3 rounded-full bg-red-500 animate-pulse" />
+        )}
+
+        <span className="text-sm font-semibold">
+          {bet.live ? "LIVE" : "LOADING"}
+        </span>
+      </div>
+
       <div>
-        <div className="flex items-center gap-2 mb-3">
-          {bet.live && (
-            <span className="h-3 w-3 rounded-full bg-red-500 animate-pulse" />
-          )}
+        <p className="text-sm font-semibold text-gray-600">
+          {bet.bookmaker}
+        </p>
 
-          <span className="font-semibold">
-            {bet.live ? "LIVE" : "PENDING"}
-          </span>
-        </div>
-
-        <h2 className="text-2xl font-bold">
-          {bet.player}
+        <h2 className="mt-2 text-xl font-bold">
+          {bet.event}
         </h2>
 
-        <p className="text-lg mt-2">
+        <p className="mt-2 text-lg">
+          {bet.team}
+        </p>
+
+        <p className="mt-1 text-sm uppercase text-gray-500">
           {bet.market}
         </p>
       </div>
 
-      <p className="text-4xl font-bold text-center">
-        {bet.odds}
+      <p className="text-center text-4xl font-bold">
+        {bet.odds === 0 ? "..." : bet.odds > 0 ? `+${bet.odds}` : bet.odds}
       </p>
     </div>
-  )
+  );
 }

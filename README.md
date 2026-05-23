@@ -2,11 +2,11 @@
 Realtime sports odds analytics platform
 
 Motivation:
-Current sports dashboards are either extremely hard to navigate or provide sportsbooks that are unknown/sketchy and aren't very in depth
+Current sports dashboards are either extremely hard to navigate or provide sportsbooks that are unknown/sketchy and don't show the heaviest favorites/underdogs
 
 Goals:
 Mock live odd updates first, then replace with api data
-Track the MOST likely odds of the day in the frontpage
+Track the heaviest favorites and underdogs odds of the day in the frontpage
 Add filters/UI features to make the site look clean
 Add Odds movement tracking to track odds over time for the present day like biggest movers today, fastest moving lines (most volatile odds) and sharp movement alerts so users know ot maybe avoid the line or choose it if the line suddenly swings in one team's favor
 Favorites/watchlists system with login and db features
@@ -15,9 +15,12 @@ maybe an arbitrage finder and some AI features after this stuff is implemented
 
 
 To do:
--create websocket server that sends odds maybe once every few seconds
--update cards live on front end with this
--replace with real data
+-create websocket server that sends odds maybe once every few seconds (done)
+-update cards live on front end with this (done)
+-replace with real data (done)
+-redesign frontend to look cleaner
+-track heaviest favorites and underdogs in homepage (change to best favorite/underdog per team later instead of duplicate sportsbook entries.)
+-create seperate pages for the dashboard and analytics graphs
 
 Backend Go Setup:
 go mod init backend (in backend folder)
@@ -28,6 +31,7 @@ go run main.go
 
 Build into native program:
 go build
+./backend.exe (or whatever the build executable is called)
 
 API endpoints:
 All sports

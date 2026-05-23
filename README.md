@@ -19,7 +19,7 @@ To do:
 -update cards live on front end with this (done)
 -replace with real data (done)
 -redesign frontend to look cleaner
--track heaviest favorites and underdogs in homepage
+-track heaviest favorites and underdogs in homepage (change to best favorite/underdog per team later instead of duplicate sportsbook entries.)
 -create seperate pages for the dashboard and analytics graphs
 
 Backend Go Setup:
@@ -31,6 +31,7 @@ go run main.go
 
 Build into native program:
 go build
+./backend.exe (or whatever the build executable is called)
 
 API endpoints:
 All sports

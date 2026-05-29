@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <header className="border-b border-gray-200 bg-white">
+    <header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
       <nav className="mx-auto flex h-16 items-center justify-between px-6">
         <Link href="/" className="text-2xl font-bold text-red-600">
           OddsRadar

@@ -38,6 +38,13 @@ function formatCommenceTime(commenceTime: string) {
   return `${weekday}, ${timeString}`;
 }
 
+function isLiveGame(commenceTime: string) {
+  const startTime = new Date(commenceTime).getTime();
+  const now = Date.now();
+
+  return startTime <= now; // can change later to account for current time being in a 3 hour range of commence time
+}
+
 export default function EventOddsCard({ event }: EventOddsCardProps) {
   const topBookmakers = event.bookmakers.slice(0, 4);
 
@@ -51,6 +58,13 @@ export default function EventOddsCard({ event }: EventOddsCardProps) {
             {event.awayTeam} @ {event.homeTeam}
           </h3>
         </div>
+
+        {isLiveGame(event.commenceTime) && (
+          <span className="flex items-center gap-2 text-xs font-bold text-red-500">
+            <span className="h-3 w-3 rounded-full bg-red-400 animate-pulse" />
+            LIVE
+          </span>
+        )}
 
         <p className="shrink-0 rounded-full border border-black px-3 py-1 text-sm font-bold">
           {formatCommenceTime(event.commenceTime)}

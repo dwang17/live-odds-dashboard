@@ -37,8 +37,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 
 UI Notes to add/refine:
--Consistent navbar as you scroll down
--Live icon for games still going on
--Change to top UPCOMING favorites (don't show if past commence time)
+-Change to top UPCOMING favorites (don't show if past commence time or use endpoint to check if game has gone live later?)
 -Keep games that are going on right now/have already commenced, but add a live icon for these
-games (can help to show live scores of these games add eventually?)
+games (refine to use an endpoint to verify data live later?)
+-In addition, eventually add live scores of these games using a diff endpoint
+
+-make ui look prettier after all this lol

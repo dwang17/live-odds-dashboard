@@ -7,18 +7,38 @@ import { EventOdds, OddsBet, OddsPayload } from "@/types/odds";
 
 const WS_URL = process.env.NEXT_PUBLIC_ODDS_WS_URL ?? "ws://localhost:8080/ws";
 
-function getFavorites(odds: OddsBet[]): OddsBet[] {
-  return [...odds]
-    .filter((bet) => bet.odds < 0)
-    .sort((a, b) => a.odds - b.odds)
-    .slice(0, 5);
+//function that returns the strongest favorite for each unique pick (event + team + market)
+function getStrongestFavoritePerPick(odds: OddsBet[]): OddsBet[] {
+  const bestFavoriteMap = new Map<string, OddsBet>();
+
+  for (const bet of odds) {
+    const key = `${bet.event}-${bet.team}-${bet.market}`;
+
+    const existing = bestFavoriteMap.get(key);
+
+    if (!existing || bet.odds < existing.odds) {
+      bestFavoriteMap.set(key, bet);
+    }
+  }
+
+  return Array.from(bestFavoriteMap.values());
 }
 
-function getUnderdogs(odds: OddsBet[]): OddsBet[] {
-  return [...odds]
-    .filter((bet) => bet.odds > 0)
-    .sort((a, b) => b.odds - a.odds)
-    .slice(0, 5);
+//function that returns the strongest underdog for each unique pick (event + team + market)
+function getBiggestUnderdogPerPick(odds: OddsBet[]): OddsBet[] {
+  const bestUnderdogMap = new Map<string, OddsBet>();
+
+  for (const bet of odds) {
+    const key = `${bet.event}-${bet.team}-${bet.market}`;
+
+    const existing = bestUnderdogMap.get(key);
+
+    if (!existing || bet.odds > existing.odds) {
+      bestUnderdogMap.set(key, bet);
+    }
+  }
+
+  return Array.from(bestUnderdogMap.values());
 }
 
 export default function LiveOdds() {
@@ -64,8 +84,29 @@ export default function LiveOdds() {
     };
   }, []);
 
-  const favorites = getFavorites(topOdds);
-  const underdogs = getUnderdogs(topOdds);
+
+  //filter to show top upcoming odds for today (otherwise if the game is live it can be heavily skewed)
+  const upcomingOdds = topOdds.filter((bet) => {
+    return new Date(bet.commenceTime).getTime() > Date.now();
+  });
+
+  //select favorite and underdog per pick to avoid showing multiple bets for the same pick
+  //this makes it so multiple bookmakers offering odds on the same team in the same game aren't shown again
+  const favoritePool = getStrongestFavoritePerPick(
+    upcomingOdds.filter((bet) => bet.odds < 0)
+  );
+
+  const underdogPool = getBiggestUnderdogPerPick(
+    upcomingOdds.filter((bet) => bet.odds > 0)
+  );
+
+  const favorites = favoritePool
+    .sort((a, b) => a.odds - b.odds)
+    .slice(0, 5);
+
+  const underdogs = underdogPool
+    .sort((a, b) => b.odds - a.odds)
+    .slice(0, 5);
 
   const loadingCard: OddsBet = {
     id: 0,
@@ -75,6 +116,7 @@ export default function LiveOdds() {
     market: "H2H",
     odds: 0,
     lastUpdate: "",
+    commenceTime: "",
     live: false,
   };
 

@@ -6,6 +6,7 @@ export interface OddsBet {
   market: string;
   odds: number;
   lastUpdate: string;
+  commenceTime: string;
   live: boolean;
 }
 

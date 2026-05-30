@@ -18,14 +18,15 @@ type OddsPayload struct {
 }
 
 type OddsBet struct {
-	ID         int    `json:"id"`
-	Event      string `json:"event"`
-	Team       string `json:"team"`
-	Bookmaker  string `json:"bookmaker"`
-	Market     string `json:"market"`
-	Odds       int    `json:"odds"`
-	LastUpdate string `json:"lastUpdate"`
-	Live       bool   `json:"live"`
+	ID           int    `json:"id"`
+	Event        string `json:"event"`
+	Team         string `json:"team"`
+	Bookmaker    string `json:"bookmaker"`
+	Market       string `json:"market"`
+	Odds         int    `json:"odds"`
+	LastUpdate   string `json:"lastUpdate"`
+	CommenceTime string `json:"commenceTime"`
+	Live         bool   `json:"live"`
 }
 
 type EventOdds struct {
@@ -161,14 +162,15 @@ func fetchOddsPayload() (OddsPayload, error) {
 					})
 
 					payload.TopOdds = append(payload.TopOdds, OddsBet{
-						ID:         oddsID,
-						Event:      eventName,
-						Team:       outcome.Name,
-						Bookmaker:  bookmaker.Title,
-						Market:     "H2H",
-						Odds:       outcome.Price,
-						LastUpdate: bookmaker.LastUpdate,
-						Live:       true,
+						ID:           oddsID,
+						Event:        eventName,
+						Team:         outcome.Name,
+						Bookmaker:    bookmaker.Title,
+						Market:       "H2H",
+						Odds:         outcome.Price,
+						LastUpdate:   bookmaker.LastUpdate,
+						CommenceTime: game.CommenceTime,
+						Live:         true,
 					})
 
 					oddsID++
@@ -207,8 +209,8 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 		}
-
-		time.Sleep(5 * time.Minute)
+		// can adjust frequency of odds being pulled in later
+		time.Sleep(10 * time.Minute)
 	}
 }
 

@@ -37,9 +37,12 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 
 UI Notes to add/refine:
--Change to top UPCOMING favorites (don't show if past commence time or use endpoint to check if game has gone live later?)
+get rid of live icons and change screen so it says top UPCOMING favorites/underdogs
+
+done but should refine later:
 -Keep games that are going on right now/have already commenced, but add a live icon for these
 games (refine to use an endpoint to verify data live later?)
 -In addition, eventually add live scores of these games using a diff endpoint
+-Change to top UPCOMING favorites (don't show if past commence time or use endpoint to check if game has gone live later?)
 
 -make ui look prettier after all this lol

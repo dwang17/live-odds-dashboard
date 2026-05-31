@@ -49,45 +49,49 @@ export default function EventOddsCard({ event }: EventOddsCardProps) {
   const topBookmakers = event.bookmakers.slice(0, 4);
 
   return (
-    <div className="rounded-3xl border-2 border-black bg-white p-6">
-      <div className="mb-5 flex items-center justify-between gap-4">
-        <div>
-          <p className="text-sm font-bold text-slate-500">{event.sportTitle}</p>
-
-          <h3 className="mt-1 text-xl font-bold">
-            {event.awayTeam} @ {event.homeTeam}
-          </h3>
-        </div>
-
-        {isLiveGame(event.commenceTime) && (
-          <span className="flex items-center gap-2 text-xs font-bold text-red-500">
-            <span className="h-3 w-3 rounded-full bg-red-400 animate-pulse" />
-            LIVE
-          </span>
-        )}
-
-        <p className="shrink-0 rounded-full border border-black px-3 py-1 text-sm font-bold">
-          {formatCommenceTime(event.commenceTime)}
+    <div className="rounded-2xl border border-slate-500 bg-white p-6 hover:border-red-500 hover:-translate-y-0.5 hover:shadow-lg transition duration-200">
+      <div className="mb-5">
+        <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+          {event.sportTitle}
         </p>
+
+        <h3 className="mt-2 text-lg font-semibold text-slate-900">
+          {event.awayTeam} @ {event.homeTeam}
+        </h3>
+
+        <div className="mt-2 flex items-center gap-3">
+          <p className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-medium text-slate-700">
+            {formatCommenceTime(event.commenceTime)}
+          </p>
+
+          {isLiveGame(event.commenceTime) && (
+            <span className="flex items-center gap-2 rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse" />
+              LIVE
+            </span>
+          )}
+        </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {topBookmakers.map((bookmaker) => (
           <div
             key={bookmaker.title}
-            className="rounded-2xl border border-slate-300 p-4"
+            className="rounded-lg border border-slate-100 bg-slate-50 p-4"
           >
-            <p className="mb-3 text-sm font-bold">{bookmaker.title}</p>
+            <p className="mb-3 text-sm font-semibold text-slate-700">
+              {bookmaker.title}
+            </p>
 
-            <div className="grid gap-2 md:grid-cols-2">
+            <div className="grid gap-3 md:grid-cols-2">
               {bookmaker.outcomes.map((outcome) => (
                 <div
                   key={`${bookmaker.title}-${outcome.name}`}
-                  className="rounded-xl border border-blue-400 px-4 py-3"
+                  className="rounded-md border border-slate-200 bg-white px-4 py-3"
                 >
-                  <p className="text-sm text-slate-600">{outcome.name}</p>
+                  <p className="text-sm text-slate-500">{outcome.name}</p>
 
-                  <p className="mt-1 text-xl font-bold">
+                  <p className="mt-2 text-lg font-semibold text-slate-900">
                     {formatOdds(outcome.price)}
                   </p>
                 </div>

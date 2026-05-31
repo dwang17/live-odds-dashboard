@@ -84,7 +84,6 @@ export default function LiveOdds() {
     };
   }, []);
 
-
   //filter to show top upcoming odds for today (otherwise if the game is live it can be heavily skewed)
   const upcomingOdds = topOdds.filter((bet) => {
     return new Date(bet.commenceTime).getTime() > Date.now();
@@ -93,20 +92,16 @@ export default function LiveOdds() {
   //select favorite and underdog per pick to avoid showing multiple bets for the same pick
   //this makes it so multiple bookmakers offering odds on the same team in the same game aren't shown again
   const favoritePool = getStrongestFavoritePerPick(
-    upcomingOdds.filter((bet) => bet.odds < 0)
+    upcomingOdds.filter((bet) => bet.odds < 0),
   );
 
   const underdogPool = getBiggestUnderdogPerPick(
-    upcomingOdds.filter((bet) => bet.odds > 0)
+    upcomingOdds.filter((bet) => bet.odds > 0),
   );
 
-  const favorites = favoritePool
-    .sort((a, b) => a.odds - b.odds)
-    .slice(0, 5);
+  const favorites = favoritePool.sort((a, b) => a.odds - b.odds).slice(0, 5);
 
-  const underdogs = underdogPool
-    .sort((a, b) => b.odds - a.odds)
-    .slice(0, 5);
+  const underdogs = underdogPool.sort((a, b) => b.odds - a.odds).slice(0, 5);
 
   const loadingCard: OddsBet = {
     id: 0,
@@ -123,9 +118,13 @@ export default function LiveOdds() {
   return (
     <section className="space-y-20">
       <div>
-        <h2 className="mb-6 text-3xl font-bold">
-          Top Favorites for Today
-        </h2>
+        <div className="mb-6">
+          <h2 className="text-4xl font-bold">Top Upcoming Favorites</h2>
+
+          <p className="mt-2 text-slate-600">
+            Strongest moneyline favorites across upcoming games
+          </p>
+        </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
           {(favorites.length > 0 ? favorites : [loadingCard]).map((bet) => (
@@ -135,9 +134,13 @@ export default function LiveOdds() {
       </div>
 
       <div>
-        <h2 className="mb-6 text-3xl font-bold">
-          Top Underdogs for Today
-        </h2>
+        <div className="mb-6">
+          <h2 className="text-4xl font-bold">Top Upcoming Underdogs</h2>
+
+          <p className="mt-2 text-slate-600">
+            Biggest plus-money underdogs across upcoming games
+          </p>
+        </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
           {(underdogs.length > 0 ? underdogs : [loadingCard]).map((bet) => (
@@ -152,10 +155,10 @@ export default function LiveOdds() {
         {status === "live"
           ? "Live backend odds streaming via websocket."
           : status === "connecting"
-          ? "Connecting to backend websocket..."
-          : status === "error"
-          ? "Unable to connect to backend. Check backend is running at ws://localhost:8080/ws."
-          : "Backend connection closed."}
+            ? "Connecting to backend websocket..."
+            : status === "error"
+              ? "Unable to connect to backend. Check backend is running at ws://localhost:8080/ws."
+              : "Backend connection closed."}
       </p>
     </section>
   );

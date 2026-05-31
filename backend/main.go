@@ -12,13 +12,40 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type Odds struct {
-	Event      string `json:"event"`
-	Team       string `json:"team"`
-	Bookmaker  string `json:"bookmaker"`
-	Market     string `json:"market"`
-	Odds       int    `json:"odds"`
-	LastUpdate string `json:"lastUpdate"`
+type OddsPayload struct {
+	TopOdds []OddsBet   `json:"topOdds"`
+	Events  []EventOdds `json:"events"`
+}
+
+type OddsBet struct {
+	ID           int    `json:"id"`
+	Event        string `json:"event"`
+	Team         string `json:"team"`
+	Bookmaker    string `json:"bookmaker"`
+	Market       string `json:"market"`
+	Odds         int    `json:"odds"`
+	LastUpdate   string `json:"lastUpdate"`
+	CommenceTime string `json:"commenceTime"`
+	Live         bool   `json:"live"`
+}
+
+type EventOdds struct {
+	ID           string          `json:"id"`
+	SportTitle   string          `json:"sportTitle"`
+	CommenceTime string          `json:"commenceTime"`
+	HomeTeam     string          `json:"homeTeam"`
+	AwayTeam     string          `json:"awayTeam"`
+	Bookmakers   []BookmakerOdds `json:"bookmakers"`
+}
+
+type BookmakerOdds struct {
+	Title    string        `json:"title"`
+	Outcomes []OutcomeOdds `json:"outcomes"`
+}
+
+type OutcomeOdds struct {
+	Name  string `json:"name"`
+	Price int    `json:"price"`
 }
 
 type ApiOutcome struct {
@@ -39,75 +66,126 @@ type ApiBookmaker struct {
 }
 
 type ApiGame struct {
-	HomeTeam   string         `json:"home_team"`
-	AwayTeam   string         `json:"away_team"`
-	Bookmakers []ApiBookmaker `json:"bookmakers"`
+	ID           string         `json:"id"`
+	SportKey     string         `json:"sport_key"`
+	SportTitle   string         `json:"sport_title"`
+	CommenceTime string         `json:"commence_time"`
+	HomeTeam     string         `json:"home_team"`
+	AwayTeam     string         `json:"away_team"`
+	Bookmakers   []ApiBookmaker `json:"bookmakers"`
 }
 
-// initialize websocket upgrader to keep socket open with default options
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
 }
 
-// sample fetch odds for now, h2h/moneyline data
-func fetchOdds() ([]Odds, error) {
-	//get API key from env file
+func fetchOddsPayload() (OddsPayload, error) {
 	apiKey := os.Getenv("ODDS_API_KEY")
 
-	//format URL with API key from env file
+	// can add commence time specifics later
+	nowUTC := time.Now().UTC()
+
+	// endUTC := nowUTC.Add(24 * time.Hour)
+
+	commenceTimeFrom := nowUTC.Format(time.RFC3339)
+	//end at next 24 hours, comment out for now
+	// commenceTimeTo := endUTC.Format(time.RFC3339)
+
+	//add later possibly: &commenceTimeTo=%s to url
 	url := fmt.Sprintf(
-		"https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey=%s&regions=us&oddsFormat=american",
+		"https://api.the-odds-api.com/v4/sports/upcoming/odds/?apiKey=%s&regions=us&markets=h2h&oddsFormat=american&commenceTimeFrom=%s",
 		apiKey,
+		commenceTimeFrom,
+		// commenceTimeTo,
 	)
 
 	resp, err := http.Get(url)
 
 	if err != nil {
-		log.Println("Error fetching odds:", err)
-		return nil, err
+		return OddsPayload{}, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("API returned status: %s", resp.Status)
+		return OddsPayload{}, fmt.Errorf("API returned status: %s", resp.Status)
 	}
 
-	var games []ApiGame
+	var apiGames []ApiGame
 
-	err = json.NewDecoder(resp.Body).Decode(&games)
+	err = json.NewDecoder(resp.Body).Decode(&apiGames)
 
 	if err != nil {
-		return nil, err
+		return OddsPayload{}, err
 	}
 
-	var odds []Odds
+	payload := OddsPayload{
+		TopOdds: []OddsBet{},
+		Events:  []EventOdds{},
+	}
 
-	for _, game := range games {
+	oddsID := 1
+
+	for _, game := range apiGames {
+		if len(game.Bookmakers) == 0 {
+			continue
+		}
+
 		eventName := game.AwayTeam + " @ " + game.HomeTeam
+
+		event := EventOdds{
+			ID:           game.ID,
+			SportTitle:   game.SportTitle,
+			CommenceTime: game.CommenceTime,
+			HomeTeam:     game.HomeTeam,
+			AwayTeam:     game.AwayTeam,
+			Bookmakers:   []BookmakerOdds{},
+		}
 
 		for _, bookmaker := range game.Bookmakers {
 			for _, market := range bookmaker.Markets {
-				for _, outcome := range market.Outcomes {
-					odds = append(odds, Odds{
-						Event:      eventName,
-						Team:       outcome.Name,
-						Bookmaker:  bookmaker.Title,
-						Market:     market.Key,
-						Odds:       outcome.Price,
-						LastUpdate: bookmaker.LastUpdate,
-					})
+				if market.Key != "h2h" {
+					continue
 				}
+
+				bookmakerOdds := BookmakerOdds{
+					Title:    bookmaker.Title,
+					Outcomes: []OutcomeOdds{},
+				}
+
+				for _, outcome := range market.Outcomes {
+					bookmakerOdds.Outcomes = append(bookmakerOdds.Outcomes, OutcomeOdds{
+						Name:  outcome.Name,
+						Price: outcome.Price,
+					})
+
+					payload.TopOdds = append(payload.TopOdds, OddsBet{
+						ID:           oddsID,
+						Event:        eventName,
+						Team:         outcome.Name,
+						Bookmaker:    bookmaker.Title,
+						Market:       "H2H",
+						Odds:         outcome.Price,
+						LastUpdate:   bookmaker.LastUpdate,
+						CommenceTime: game.CommenceTime,
+						Live:         true,
+					})
+
+					oddsID++
+				}
+
+				event.Bookmakers = append(event.Bookmakers, bookmakerOdds)
 			}
 		}
+
+		payload.Events = append(payload.Events, event)
 	}
 
-	return odds, nil
+	return payload, nil
 }
 
-// handle websocket connection and re-poll every 5 mins
 func wsHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 
@@ -116,16 +194,14 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	defer conn.Close() //run before function exits to ensure connection is closed
+	defer conn.Close()
 
-	// continuously re-poll and send data to frontend every 5 mins until connection is closed
 	for {
-		data, err := fetchOdds()
+		data, err := fetchOddsPayload()
 
 		if err != nil {
 			log.Println("Error fetching odds:", err)
 		} else {
-			//send odds data as JSON to frontend
 			err = conn.WriteJSON(data)
 
 			if err != nil {
@@ -133,24 +209,22 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 		}
-
-		time.Sleep(5 * time.Minute) //update live odds every 5 mins for limit purposes
+		// can adjust frequency of odds being pulled in later
+		time.Sleep(10 * time.Minute)
 	}
 }
 
 func main() {
-	err := godotenv.Load() //load environment variables from .env file
+	err := godotenv.Load()
 
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("No .env file found")
 	}
 
-	//websocket endpoint /ws to handle connections and send odds
 	http.HandleFunc("/ws", wsHandler)
 
 	log.Println("Server running on :8080")
 
-	//start server on port 8080 and log any errors
 	err = http.ListenAndServe(":8080", nil)
 
 	if err != nil {

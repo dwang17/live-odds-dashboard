@@ -1,0 +1,105 @@
+import { EventOdds } from "@/types/odds";
+
+interface EventOddsCardProps {
+  event: EventOdds;
+}
+
+function formatOdds(price: number) {
+  if (price > 0) {
+    return `+${price}`;
+  }
+
+  return price.toString();
+}
+
+function formatCommenceTime(commenceTime: string) {
+  const eventDate = new Date(commenceTime);
+
+  const now = new Date();
+
+  const isToday =
+    eventDate.getDate() === now.getDate() &&
+    eventDate.getMonth() === now.getMonth() &&
+    eventDate.getFullYear() === now.getFullYear();
+
+  const timeString = eventDate.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+  if (isToday) {
+    return `Today, ${timeString}`;
+  }
+
+  const weekday = eventDate.toLocaleDateString([], {
+    weekday: "long",
+  });
+
+  return `${weekday}, ${timeString}`;
+}
+
+function isLiveGame(commenceTime: string) {
+  const startTime = new Date(commenceTime).getTime();
+  const now = Date.now();
+
+  return startTime <= now; // can change later to account for current time being in a 3 hour range of commence time
+}
+
+export default function EventOddsCard({ event }: EventOddsCardProps) {
+  const topBookmakers = event.bookmakers.slice(0, 4);
+
+  return (
+    <div className="rounded-2xl border border-slate-500 bg-white p-6 hover:border-red-500 hover:-translate-y-0.5 hover:shadow-lg transition duration-200">
+      <div className="mb-5">
+        <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+          {event.sportTitle}
+        </p>
+
+        <h3 className="mt-2 text-lg font-semibold text-slate-900">
+          {event.awayTeam} @ {event.homeTeam}
+        </h3>
+
+        <div className="mt-2 flex items-center gap-3">
+          <p className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-medium text-slate-700">
+            {formatCommenceTime(event.commenceTime)}
+          </p>
+
+          {isLiveGame(event.commenceTime) && (
+            <span className="flex items-center gap-2 rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse" />
+              LIVE
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {topBookmakers.map((bookmaker) => (
+          <div
+            key={bookmaker.title}
+            className="rounded-lg border border-slate-100 bg-slate-50 p-4"
+          >
+            <p className="mb-3 text-sm font-semibold text-slate-700">
+              {bookmaker.title}
+            </p>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              {bookmaker.outcomes.map((outcome) => (
+                <div
+                  key={`${bookmaker.title}-${outcome.name}`}
+                  className="rounded-md border border-slate-200 bg-white px-4 py-3"
+                >
+                  <p className="text-sm text-slate-500">{outcome.name}</p>
+
+                  <p className="mt-2 text-lg font-semibold text-slate-900">
+                    {formatOdds(outcome.price)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

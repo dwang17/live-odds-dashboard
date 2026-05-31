@@ -34,3 +34,15 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+UI Notes to add/refine:
+get rid of live icons and change screen so it says top UPCOMING favorites/underdogs
+
+done but should refine later:
+-Keep games that are going on right now/have already commenced, but add a live icon for these
+games (refine to use an endpoint to verify data live later?)
+-In addition, eventually add live scores of these games using a diff endpoint
+-Change to top UPCOMING favorites (don't show if past commence time or use endpoint to check if game has gone live later?)
+
+-make ui look prettier after all this lol

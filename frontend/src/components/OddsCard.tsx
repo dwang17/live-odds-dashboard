@@ -16,17 +16,8 @@ export default function OddsCard({ bet }: OddsCardProps) {
   return (
     <div className="w-full rounded-3xl border-2 border-black bg-white p-6 flex flex-col justify-between min-h-[220px]">
       <div>
-        <div className="flex items-center gap-2">
-          {bet.live && (
-            <span className="h-3 w-3 rounded-full bg-red-400 animate-pulse" />
-          )}
 
-          <span className="text-sm font-bold">
-            {bet.live ? "LIVE" : "LOADING"}
-          </span>
-        </div>
-
-        <p className="mt-5 text-sm font-bold text-slate-600">
+        <p className="mt-3 text-sm font-bold text-slate-600">
           {bet.bookmaker}
         </p>
 

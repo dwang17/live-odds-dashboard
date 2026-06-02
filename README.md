@@ -26,6 +26,11 @@ Backend Go Setup:
 go mod init backend (in backend folder)
 go get github.com/gorilla/websocket (install websocket pkg)
 
+Local commands:
+go mod download/go mod tidy
+
+
+
 Run backend:
 go run main.go
 

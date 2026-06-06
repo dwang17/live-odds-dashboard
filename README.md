@@ -26,6 +26,11 @@ Backend Go Setup:
 go mod init backend (in backend folder)
 go get github.com/gorilla/websocket (install websocket pkg)
 
+Local commands:
+go mod download/go mod tidy
+
+
+
 Run backend:
 go run main.go
 
@@ -42,3 +47,17 @@ https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey={API_KEY}&reg
 
 (player props)
 https://api.the-odds-api.com/v4/sports/basketball_nba/events/{EVENT_ID}/odds/?apiKey={API_KEY}&regions=us&markets=h2h
+
+To do:
+-add a sidebar for a multitude of sports that the odds api has and supports
+-link those pages to the respective sports endpoints and have api calls for those sports and their respective pages
+-connect database like mysql
+-add login system and respective tables
+-add favorite system
+
+More advanced features in future:
+-ai features (open ai api to start but then add in some of my own modeling stuff)
+
+refine:
+-getting live scores/how we handle search bar data
+-look at frontend readme notes

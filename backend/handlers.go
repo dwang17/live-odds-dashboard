@@ -19,7 +19,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 
 	for {
-		data, err := fetchOddsPayload()
+		data, err := fetchUpcomingPayload()
 
 		if err != nil {
 			log.Println("Error fetching odds:", err)
@@ -43,7 +43,8 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	query := strings.ToLower(r.URL.Query().Get("q"))
 
 	// Fetch current odds data
-	payload, err := fetchOddsPayload()
+	// Fetch current odds data for homepage (upcoming)
+	payload, err := fetchUpcomingPayload()
 	if err != nil {
 		log.Println("Error fetching odds:", err)
 		w.Header().Set("Content-Type", "application/json")
@@ -94,4 +95,23 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(results)
+}
+
+// Odds handler returns the odds payload for a given sport key (query param `sport`).
+func oddsHandler(w http.ResponseWriter, r *http.Request) {
+	enableCORS(w)
+
+	sport := r.URL.Query().Get("sport")
+
+	payload, err := fetchSportPayload(sport)
+	if err != nil {
+		log.Println("Error fetching odds:", err)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to fetch odds"})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(payload)
 }

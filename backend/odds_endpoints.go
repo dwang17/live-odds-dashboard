@@ -8,8 +8,14 @@ import (
 	"time"
 )
 
-func fetchOddsPayload() (OddsPayload, error) {
+// fetchSportPayload fetches odds for a specific sport key.
+func fetchSportPayload(sportKey string) (OddsPayload, error) {
 	apiKey := os.Getenv("ODDS_API_KEY")
+
+	// default to the generic upcoming endpoint when no sport key is provided
+	if sportKey == "" {
+		sportKey = "upcoming"
+	}
 
 	// can add commence time specifics later
 	nowUTC := time.Now().UTC()
@@ -22,10 +28,10 @@ func fetchOddsPayload() (OddsPayload, error) {
 
 	//add later possibly: &commenceTimeTo=%s to url
 	url := fmt.Sprintf(
-		"https://api.the-odds-api.com/v4/sports/upcoming/odds/?apiKey=%s&regions=us&markets=h2h&oddsFormat=american&commenceTimeFrom=%s",
+		"https://api.the-odds-api.com/v4/sports/%s/odds/?apiKey=%s&regions=us&markets=h2h&oddsFormat=american&commenceTimeFrom=%s",
+		sportKey,
 		apiKey,
 		commenceTimeFrom,
-		// commenceTimeTo,
 	)
 
 	resp, err := http.Get(url)
@@ -111,4 +117,9 @@ func fetchOddsPayload() (OddsPayload, error) {
 	}
 
 	return payload, nil
+}
+
+// fetchUpcomingPayload is the original homepage data fetcher and returns upcoming odds.
+func fetchUpcomingPayload() (OddsPayload, error) {
+	return fetchSportPayload("upcoming")
 }

@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// scale to have a background cache refreshing where the websocket handler pulls from cached sports data
 func wsHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 
@@ -98,6 +99,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Odds handler returns the odds payload for a given sport key (query param `sport`).
+// remove this handler later to just have the websocket endpoint filter by sport key when rendering data
 func oddsHandler(w http.ResponseWriter, r *http.Request) {
 	enableCORS(w)
 

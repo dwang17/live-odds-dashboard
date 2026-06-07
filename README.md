@@ -57,8 +57,10 @@ To do:
 -add favorite system
 
 More advanced features in future:
+-background cache, where we have only one goroutine, and the cache is only refreshed if at least one websocket client is connected
 -ai features (open ai api to start but then add in some of my own modeling stuff)
 
 refine:
 -getting live scores/how we handle search bar data
+-extra frontend refinement later
 -look at frontend readme notes

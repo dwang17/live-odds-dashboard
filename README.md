@@ -33,6 +33,7 @@ go mod download/go mod tidy
 
 Run backend:
 go run main.go
+go run . (to run the whole package)
 
 Build into native program:
 go build

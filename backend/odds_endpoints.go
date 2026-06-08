@@ -5,8 +5,18 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
+
+type ApiSport struct {
+	Key          string `json:"key"`
+	Group        string `json:"group"`
+	Title        string `json:"title"`
+	Description  string `json:"description"`
+	Active       bool   `json:"active"`
+	HasOutrights bool   `json:"has_outrights"`
+}
 
 // fetchSportPayload fetches odds for a specific sport key.
 func fetchSportPayload(sportKey string) (OddsPayload, error) {
@@ -122,4 +132,50 @@ func fetchSportPayload(sportKey string) (OddsPayload, error) {
 // fetchUpcomingPayload is the original homepage data fetcher and returns upcoming odds.
 func fetchUpcomingPayload() (OddsPayload, error) {
 	return fetchSportPayload("upcoming")
+}
+
+func sportsHandler(w http.ResponseWriter, r *http.Request) {
+	enableCORS(w)
+
+	apiKey := os.Getenv("ODDS_API_KEY")
+	url := fmt.Sprintf("https://api.the-odds-api.com/v4/sports/?apiKey=%s", apiKey)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to fetch sports list"})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": fmt.Sprintf("Sports API returned status: %s", resp.Status)})
+		return
+	}
+
+	var apiSports []ApiSport
+	if err := json.NewDecoder(resp.Body).Decode(&apiSports); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to decode sports list"})
+		return
+	}
+
+	filteredSports := []ApiSport{}
+	for _, sport := range apiSports {
+		if !sport.Active {
+			continue
+		}
+		lowerKey := strings.ToLower(sport.Key)
+		if sport.HasOutrights || strings.Contains(lowerKey, "outrights") || strings.Contains(lowerKey, "winner") {
+			continue
+		}
+		filteredSports = append(filteredSports, sport)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(filteredSports)
 }

@@ -109,6 +109,7 @@ func main() {
 	http.HandleFunc("/ws", wsHandler)
 	http.HandleFunc("/search", corsMiddleware(searchHandler))
 	http.HandleFunc("/odds", corsMiddleware(oddsHandler))
+	http.HandleFunc("/sports", corsMiddleware(sportsHandler))
 
 	log.Println("Server running on :8080")
 

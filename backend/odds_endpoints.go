@@ -27,21 +27,13 @@ func fetchSportPayload(sportKey string) (OddsPayload, error) {
 		sportKey = "upcoming"
 	}
 
-	// can add commence time specifics later
+	// fetch without a commenceTime filter so the API returns both upcoming and live games
 	nowUTC := time.Now().UTC()
 
-	// endUTC := nowUTC.Add(24 * time.Hour)
-
-	commenceTimeFrom := nowUTC.Format(time.RFC3339)
-	//end at next 24 hours, comment out for now
-	// commenceTimeTo := endUTC.Format(time.RFC3339)
-
-	//add later possibly: &commenceTimeTo=%s to url
 	url := fmt.Sprintf(
-		"https://api.the-odds-api.com/v4/sports/%s/odds/?apiKey=%s&regions=us&markets=h2h&oddsFormat=american&commenceTimeFrom=%s",
+		"https://api.the-odds-api.com/v4/sports/%s/odds/?apiKey=%s&regions=us&markets=h2h&oddsFormat=american",
 		sportKey,
 		apiKey,
-		commenceTimeFrom,
 	)
 
 	resp, err := http.Get(url)
@@ -58,7 +50,7 @@ func fetchSportPayload(sportKey string) (OddsPayload, error) {
 
 	var apiGames []ApiGame
 
-	err = json.NewDecoder(resp.Body).Decode(&apiGames)
+	err = json.NewDecoder(resp.Body).Decode(&apiGames) //puts the decoded JSON response into the apiGames variable using the pointer
 
 	if err != nil {
 		return OddsPayload{}, err
@@ -104,6 +96,15 @@ func fetchSportPayload(sportKey string) (OddsPayload, error) {
 						Price: outcome.Price,
 					})
 
+					// determine if the game is live by comparing commence time to now
+					//might need to alter later if API doesn't update status adequately
+					isLive := false
+					if t, err := time.Parse(time.RFC3339, game.CommenceTime); err == nil {
+						if !t.After(nowUTC) {
+							isLive = true
+						}
+					}
+
 					payload.TopOdds = append(payload.TopOdds, OddsBet{
 						ID:           oddsID,
 						Event:        eventName,
@@ -113,7 +114,7 @@ func fetchSportPayload(sportKey string) (OddsPayload, error) {
 						Odds:         outcome.Price,
 						LastUpdate:   bookmaker.LastUpdate,
 						CommenceTime: game.CommenceTime,
-						Live:         true,
+						Live:         isLive,
 					})
 
 					oddsID++
@@ -134,34 +135,23 @@ func fetchUpcomingPayload() (OddsPayload, error) {
 	return fetchSportPayload("upcoming")
 }
 
-func sportsHandler(w http.ResponseWriter, r *http.Request) {
-	enableCORS(w)
-
+func fetchSportsList() ([]ApiSport, error) {
 	apiKey := os.Getenv("ODDS_API_KEY")
 	url := fmt.Sprintf("https://api.the-odds-api.com/v4/sports/?apiKey=%s", apiKey)
 
 	resp, err := http.Get(url)
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to fetch sports list"})
-		return
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": fmt.Sprintf("Sports API returned status: %s", resp.Status)})
-		return
+		return nil, fmt.Errorf("Sports API returned status: %s", resp.Status)
 	}
 
 	var apiSports []ApiSport
 	if err := json.NewDecoder(resp.Body).Decode(&apiSports); err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to decode sports list"})
-		return
+		return nil, err
 	}
 
 	filteredSports := []ApiSport{}
@@ -176,6 +166,5 @@ func sportsHandler(w http.ResponseWriter, r *http.Request) {
 		filteredSports = append(filteredSports, sport)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(filteredSports)
+	return filteredSports, nil
 }

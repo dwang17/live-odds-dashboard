@@ -33,7 +33,7 @@ function groupSports(sports: SportConfig[]) {
 }
 
 export default function Sidebar() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [sports, setSports] = useState<SportConfig[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -76,30 +76,41 @@ export default function Sidebar() {
       <div className="flex h-full flex-col p-4">
         <button
           onClick={() => setOpen((prev) => !prev)}
-          className="mb-6 rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold hover:border-red-500"
+          className="mb-6 flex h-10 items-center justify-center rounded-xl border border-slate-300 text-sm font-semibold hover:border-red-500 hover:bg-red-50"
         >
-          {open ? "☰" : "☰"}
+          ☰
         </button>
-        
-        <nav className="space-y-4 overflow-y-auto">
+
+        <nav className={`space-y-5 overflow-y-auto pr-1 ${open ? "sidebar-scrollbar" : "sidebar-scrollbar-hidden"}`}>
           {loading ? (
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-              Loading leagues...
+              {open ? "Loading leagues..." : "..."}
             </div>
           ) : (
             Object.entries(groupedSports).map(([group, groupLeagues]) => (
               <div key={group}>
-                <p className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wide text-slate-500">
-                  <span>{getGroupIcon(group)}</span>
-                  {group}
-                </p>
+                {open ? (
+                  <p className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wide text-slate-500">
+                    <span>{getGroupIcon(group)}</span>
+                    <span>{group}</span>
+                  </p>
+                ) : (
+                  <div className="mb-2 flex justify-center text-lg" title={group}>
+                    {getGroupIcon(group)}
+                  </div>
+                )}
 
                 <div className="space-y-1">
                   {groupLeagues.map((sport) => (
                     <Link
                       key={sport.key}
                       href={`/sports/${sport.key}`}
-                      className="flex items-center rounded-xl px-4 py-3 text-sm font-medium text-slate-700 hover:bg-red-50 hover:text-red-600"
+                      title={sport.title}
+                      className={`
+                flex items-center rounded-xl text-sm font-medium text-slate-700
+                hover:bg-red-50 hover:text-red-600
+                ${open ? "px-4 py-3" : "justify-center px-2 py-3"}
+              `}
                     >
                       <span className="text-lg">{getGroupIcon(sport.group)}</span>
                       {open && <span className="ml-3">{sport.title}</span>}

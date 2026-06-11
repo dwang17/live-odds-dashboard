@@ -64,3 +64,5 @@ refine:
 -getting live scores/how we handle search bar data
 -extra frontend refinement later (CLEAN UP SIDEBAR MESS AND FOR SPORT PAGES DISPLAY THE DATE ON THE CARDS as well)
 -look at frontend readme notes
+
+add live icons on the respective sports pages too not just on home page

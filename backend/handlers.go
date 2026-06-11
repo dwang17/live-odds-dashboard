@@ -117,3 +117,19 @@ func oddsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(payload)
 }
+
+func sportsHandler(w http.ResponseWriter, r *http.Request) {
+	enableCORS(w)
+
+	list, err := fetchSportsList()
+	if err != nil {
+		log.Println("Error fetching sports list:", err)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to fetch sports list"})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(list)
+}

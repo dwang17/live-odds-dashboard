@@ -10,3 +10,30 @@ body {
   color: var(--foreground);
   font-family: Arial, Ubuntu, sans-serif;
 }
+
+.sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.7) transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.7);
+  border-radius: 9999px;
+}
+
+.sidebar-scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sidebar-scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}

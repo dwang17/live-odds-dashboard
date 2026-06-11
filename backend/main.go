@@ -71,6 +71,7 @@ type ApiGame struct {
 	Bookmakers   []ApiBookmaker `json:"bookmakers"`
 }
 
+// change later to make stricter to have allowedOrigins of frontend domain only; currently allows all origins for testing purposes
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
@@ -79,7 +80,7 @@ var upgrader = websocket.Upgrader{
 
 // Enable CORS headers for all responses
 func enableCORS(w http.ResponseWriter) {
-	w.Header().Set("Access-Control-Allow-Origin", "*") //adjust later when deployed to only allow frontend domain
+	w.Header().Set("Access-Control-Allow-Origin", "*") //adjust later when deployed to only allow frontend domain; currently allows all origins
 	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 }

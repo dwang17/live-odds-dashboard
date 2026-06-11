@@ -65,7 +65,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 
 		if query == "" || strings.Contains(homeTeamLower, query) {
 			key := event.HomeTeam
-			if _, exists := uniqueResults[key]; !exists {
+			if _, exists := uniqueResults[key]; !exists { //dont care about value so we just check if key exists in map to ensure uniqueness
 				uniqueResults[key] = map[string]string{
 					"id":    event.ID + "_home",
 					"label": event.HomeTeam,
@@ -110,7 +110,7 @@ func oddsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error fetching odds:", err)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to fetch odds"})
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to fetch odds"}) //map[key type]value type, in this case both are strings
 		return
 	}
 

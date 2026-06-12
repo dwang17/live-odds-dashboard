@@ -52,7 +52,8 @@ https://api.the-odds-api.com/v4/sports/basketball_nba/events/{EVENT_ID}/odds/?ap
 To do:
 -add a sidebar for a multitude of sports that the odds api has and supports
 -link those pages to the respective sports endpoints and have api calls for those sports and their respective pages
--connect database like mysql
+-add live scores (look at api docs for endpoints)
+-connect supabase auth and database
 -add login system and respective tables
 -add favorite system
 
@@ -66,3 +67,9 @@ refine:
 -look at frontend readme notes
 
 add live icons on the respective sports pages too not just on home page
+
+Infrastructure:
+Supabase Auth for accounts
+Supabase Postgres for favorites
+Go backend for odds/data API logic
+Next.js frontend for UI

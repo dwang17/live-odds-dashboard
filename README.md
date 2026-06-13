@@ -55,7 +55,7 @@ To do:
 -add live scores (look at api docs for endpoints)
 -connect supabase auth and database
 -add login system and respective tables
--add favorite system
+-add favorite system/watchlist so that they have their own tailored page and some alerting
 
 More advanced features in future:
 -background cache, where we have only one goroutine, and the cache is only refreshed if at least one websocket client is connected
@@ -73,3 +73,5 @@ Supabase Auth for accounts
 Supabase Postgres for favorites
 Go backend for odds/data API logic
 Next.js frontend for UI
+
+could add account features of tracking odds taken over time

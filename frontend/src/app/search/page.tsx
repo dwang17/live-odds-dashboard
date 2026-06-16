@@ -77,8 +77,6 @@ export default function SearchPage() {
 
   return (
     <div>
-      <Navbar />
-
       <main className="min-h-screen bg-neutral-100 px-8 py-6">
         <section className="flex min-h-[70vh] flex-col items-center justify-center text-center">
           <h1 className="mb-10 max-w-5xl text-4xl font-semibold tracking-wide">

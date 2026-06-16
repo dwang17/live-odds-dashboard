@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export default function SignInPage() {
+export default function SignUpPage() {
   const supabase = createClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,17 +12,18 @@ export default function SignInPage() {
   const [messageType, setMessageType] = useState<"error" | "success">("error");
   const isDisabled = !email.trim() || !password.trim();
 
-  async function signIn() {
-    const { error } = await supabase.auth.signInWithPassword({
+  async function signUp() {
+    const { error } = await supabase.auth.signUp({
       email,
       password,
     });
 
     if (error) {
       setMessageType("error");
-      setMessage(error.message || "Unable to sign in.");
+      setMessage(error.message || "Unable to create account.");
     } else {
-      window.location.href = "/";
+      setMessageType("success");
+      setMessage("Account created. You can now sign in.");
     }
   }
 
@@ -33,8 +34,8 @@ export default function SignInPage() {
       </Link>
 
       <section className="mx-auto mt-10 max-w-xl rounded-xl border border-gray-200 bg-white px-12 py-14 shadow-sm">
-        <p className="text-gray-400">Please enter your details</p>
-        <h1 className="mt-2 text-5xl font-bold text-gray-900">Welcome back</h1>
+        <p className="text-gray-400">Create your account</p>
+        <h1 className="mt-2 text-5xl font-bold text-gray-900">Sign up</h1>
 
         <div className="mt-16 space-y-6">
           <input
@@ -72,18 +73,18 @@ export default function SignInPage() {
 
           <button
             type="button"
-            onClick={signIn}
+            onClick={signUp}
             disabled={isDisabled}
             className="w-full rounded-lg bg-red-600 py-4 font-semibold text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
-            Sign in
+            Sign up
           </button>
         </div>
 
         <p className="mt-8 text-center text-gray-400">
-          Don&apos;t have an account?{" "}
-          <Link href="/signup" className="font-medium text-red-600 underline">
-            Sign up here
+          Already have an account?{" "}
+          <Link href="/signin" className="font-medium text-red-600 underline">
+            Sign in here
           </Link>
         </p>
       </section>

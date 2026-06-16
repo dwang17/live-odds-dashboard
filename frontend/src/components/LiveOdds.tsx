@@ -121,7 +121,7 @@ export default function LiveOdds() {
         <div className="mb-6">
           <h2 className="text-4xl font-bold">Top Upcoming Favorites</h2>
 
-          <p className="mt-2 text-slate-600">
+          <p className="mt-2 text-slate-600 border-b-2 border-black pb-3">
             Strongest moneyline favorites across upcoming games
           </p>
         </div>
@@ -137,7 +137,7 @@ export default function LiveOdds() {
         <div className="mb-6">
           <h2 className="text-4xl font-bold">Top Upcoming Underdogs</h2>
 
-          <p className="mt-2 text-slate-600">
+          <p className="mt-2 text-slate-600 border-b-2 border-black pb-3">
             Biggest plus-money underdogs across upcoming games
           </p>
         </div>

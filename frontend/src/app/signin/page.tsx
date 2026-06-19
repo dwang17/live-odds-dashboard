@@ -12,19 +12,28 @@ export default function SignInPage() {
   const [messageType, setMessageType] = useState<"error" | "success">("error");
   const isDisabled = !email.trim() || !password.trim();
 
-  async function signIn() {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+async function signIn() {
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
-    if (error) {
-      setMessageType("error");
-      setMessage(error.message || "Unable to sign in.");
-    } else {
-      window.location.href = "/";
+  if (error) {
+    if (
+      error.message.toLowerCase().includes("email not confirmed") ||
+      error.message.toLowerCase().includes("confirm")
+    ) {
+      window.location.href = "/confirm-email";
+      return;
     }
+
+    setMessageType("error");
+    setMessage(error.message || "Unable to sign in.");
+    return;
   }
+
+  window.location.href = "/";
+}
 
   return (
     <main className="min-h-screen mt-30 bg-gray-50 px-6 py-10">

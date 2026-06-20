@@ -23,7 +23,7 @@ export default function OddsCard({ bet }: OddsCardProps) {
         </p>
 
         <p className="mt-3">
-          <span className="px-3 py-1 rounded-full text-base font-semibold uppercase tracking-[0.08em] shadow-sm border border-slate-300">
+          <span className="px-3 py-1 rounded-full text-base font-semibold tracking-[0.08em] shadow-sm border border-slate-300">
             {bet.sport}
           </span>
         </p>

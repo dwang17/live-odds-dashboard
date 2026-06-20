@@ -22,6 +22,12 @@ export default function OddsCard({ bet }: OddsCardProps) {
           {bet.bookmaker}
         </p>
 
+        <p className="mt-3">
+          <span className="px-3 py-1 rounded-full text-base font-semibold uppercase tracking-[0.08em] shadow-sm border border-slate-300">
+            {bet.sport}
+          </span>
+        </p>
+
         <h3 className="mt-3 text-lg font-semibold leading-snug text-slate-900">
           {bet.event}
         </h3>

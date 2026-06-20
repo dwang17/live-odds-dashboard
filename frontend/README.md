@@ -40,8 +40,7 @@ UI Notes to add/refine:
 get rid of live icons and change screen so it says top UPCOMING favorites/underdogs
 
 Auth refinements:
--have it so when user confirms their email they are redirected to their profile and logged in. or just create a dummy pop up window saying "success! you may log in now"
--add profile tab and dropdown in navbar
+-add a small banner/toast when a user is verified and logged in for first time
 
 Next Steps:
 -make a watchlist/favorites table in supabase and let users choose and select favorite leagues and stuff. then make a watchlist page that if the user is logged in they see a personalized page with their watchlisted league odds

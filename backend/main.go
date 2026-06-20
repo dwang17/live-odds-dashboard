@@ -15,6 +15,7 @@ type OddsPayload struct {
 
 type OddsBet struct {
 	ID           int    `json:"id"`
+	Sport        string `json:"sport"`
 	Event        string `json:"event"`
 	Team         string `json:"team"`
 	Bookmaker    string `json:"bookmaker"`

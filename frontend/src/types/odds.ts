@@ -1,5 +1,6 @@
 export interface OddsBet {
   id: number;
+  sport: string;
   event: string;
   team: string;
   bookmaker: string;

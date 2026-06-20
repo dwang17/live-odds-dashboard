@@ -105,8 +105,10 @@ func fetchSportPayload(sportKey string) (OddsPayload, error) {
 						}
 					}
 
+					// fmt.Printf("Event: %s | Sport: %s\n", eventName, game.SportTitle)
 					payload.TopOdds = append(payload.TopOdds, OddsBet{
 						ID:           oddsID,
+						Sport:        game.SportTitle,
 						Event:        eventName,
 						Team:         outcome.Name,
 						Bookmaker:    bookmaker.Title,

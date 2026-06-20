@@ -105,6 +105,7 @@ export default function LiveOdds() {
 
   const loadingCard: OddsBet = {
     id: 0,
+    sport: "Connecting...",
     event: "Connecting...",
     team: "Waiting for backend odds",
     bookmaker: "Backend",

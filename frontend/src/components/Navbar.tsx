@@ -51,8 +51,8 @@ export default function Navbar() {
             Home
           </Link>
 
-          <Link href="/search" className="hover:text-red-600">
-            Search
+          <Link href="/leagues" className="hover:text-red-600">
+            Leagues
           </Link>
 
           {username ? (

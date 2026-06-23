@@ -55,6 +55,10 @@ export default function Navbar() {
             Leagues
           </Link>
 
+          <Link href="/watchlist" className="hover:text-red-600">
+            Watchlist
+          </Link>
+
           {username ? (
             <div className="relative">
               <button

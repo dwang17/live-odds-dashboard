@@ -1,8 +1,27 @@
 import Link from "next/link";
 import { getSportsList } from "@/lib/sports";
+import FavoriteLeagueButton from "@/components/FavoriteLeagueButton";
+import { createServerClientForApp } from "@/lib/supabase/server";
 
 export default async function LeaguesPage() {
   const sportsList = await getSportsList();
+
+  const supabase = await createServerClientForApp();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let favoritedSportKeys: string[] = [];
+
+  if (user) {
+    const { data } = await supabase
+      .from("user_league_watchlist")
+      .select("sport_key")
+      .eq("user_id", user.id);
+
+    favoritedSportKeys = data?.map((item) => item.sport_key) ?? [];
+  }
 
   return (
     <main className="min-h-screen bg-neutral-100 px-8 py-10">
@@ -24,11 +43,29 @@ export default async function LeaguesPage() {
               href={`/sports/${sport.key}`}
               className="rounded-3xl border border-slate-500 bg-white p-6 text-left transition hover:-translate-y-0.5 hover:shadow-lg"
             >
-              <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-                {sport.group}
+              <div className="flex items-start justify-between gap-4">
+                <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                  {sport.group}
+                </p>
+
+                {user && (
+                  <FavoriteLeagueButton
+                    sportKey={sport.key}
+                    sportTitle={sport.title}
+                    sportGroup={sport.group}
+                    userId={user.id}
+                    initiallyFavorited={favoritedSportKeys.includes(sport.key)}
+                  />
+                )}
+              </div>
+
+              <p className="mt-3 text-lg font-semibold text-slate-900">
+                {sport.title}
               </p>
-              <p className="mt-3 text-lg font-semibold text-slate-900">{sport.title}</p>
-              <p className="mt-4 text-sm text-slate-600">{sport.description}</p>
+
+              <p className="mt-4 text-sm text-slate-600">
+                {sport.description}
+              </p>
             </Link>
           ))}
         </div>

@@ -12,17 +12,17 @@ export interface OddsBet {
 }
 
 export interface EventOdds {
-  id: string;
+  id: string | number;
   sportTitle: string;
   commenceTime: string;
   homeTeam: string;
   awayTeam: string;
-  bookmakers: BookmakerOdds[];
+  bookmakers?: BookmakerOdds[];
 }
 
 export interface BookmakerOdds {
   title: string;
-  outcomes: OutcomeOdds[];
+  outcomes?: OutcomeOdds[];
 }
 
 export interface OutcomeOdds {
@@ -31,6 +31,6 @@ export interface OutcomeOdds {
 }
 
 export interface OddsPayload {
-  topOdds: OddsBet[];
+  topOdds?: OddsBet[];
   events: EventOdds[];
 }

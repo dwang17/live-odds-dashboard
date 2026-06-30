@@ -1,5 +1,6 @@
 import Link from "next/link";
 import EventOddsCard from "@/components/EventOddsCard";
+import { EventOdds, OddsPayload } from "@/types/odds";
 // later: import { getWatchlistEvents } from "@/lib/watchlist";
 import { createServerClientForApp } from "@/lib/supabase/server"
 
@@ -58,14 +59,21 @@ export default async function WatchlistPage() {
     }
 
     const leagues = (watchlistLeagues ?? []) as WatchlistLeague[];
+    console.log("Watchlist leagues:", leagues);
     const watchlistCount = leagues.length;
 
-    const groupedEvents: Record<string, any[]> = {};
+    const groupedEvents: Record<string, EventOdds[]> = {};
 
-    // temporary: creates the league sections from DB favorites
-    // later: replace [] with real fetched events for each sport_key using backend API
+    // takes the favorited sports from db and fetches real events for each sport_key using backend API
     for (const league of leagues) {
-        groupedEvents[league.sport_title] = [];
+        try {
+            const response = await fetch(`http://localhost:8080/odds?sport=${league.sport_key}`);
+            const data = (await response.json()) as OddsPayload;
+            groupedEvents[league.sport_title] = Array.isArray(data.events) ? data.events : [];
+        } catch (error) {
+            console.error(`Error fetching events for ${league.sport_title}:`, error);
+            groupedEvents[league.sport_title] = [];
+        }
     }
 
     return (
@@ -115,7 +123,7 @@ export default async function WatchlistPage() {
 
                             {sportEvents.length === 0 ? (
                                 <div className="rounded-3xl border border-slate-300 bg-white p-6 text-slate-600">
-                                    League is currently not showing any odds or inactive.
+                                    League is currently not showing any odds or the league is inactive.
                                 </div>
                             ) : (
                                 <div className="grid gap-6 lg:grid-cols-2">

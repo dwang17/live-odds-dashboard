@@ -46,7 +46,7 @@ function isLiveGame(commenceTime: string) {
 }
 
 export default function EventOddsCard({ event }: EventOddsCardProps) {
-  const topBookmakers = event.bookmakers.slice(0, 4);
+  const topBookmakers = (event.bookmakers ?? []).slice(0, 4);
 
   return (
     <div className="rounded-2xl border border-slate-500 bg-white p-6 hover:border-red-500 hover:-translate-y-0.5 hover:shadow-lg transition duration-200">
@@ -84,7 +84,7 @@ export default function EventOddsCard({ event }: EventOddsCardProps) {
             </p>
 
             <div className="grid gap-3 md:grid-cols-2">
-              {bookmaker.outcomes.map((outcome) => (
+              {(bookmaker.outcomes ?? []).map((outcome) => (
                 <div
                   key={`${bookmaker.title}-${outcome.name}`}
                   className="rounded-md border border-slate-200 bg-white px-4 py-3"

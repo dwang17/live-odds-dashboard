@@ -57,8 +57,8 @@ export default function LiveOdds() {
       try {
         const data = JSON.parse(event.data) as OddsPayload;
 
-        setTopOdds(data.topOdds);
-        setEvents(data.events);
+        setTopOdds(data.topOdds ?? []);
+        setEvents(data.events ?? []);
       } catch (error) {
         console.error("Failed to parse odds payload:", error);
         setStatus("error");

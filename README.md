@@ -50,28 +50,18 @@ https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey={API_KEY}&reg
 https://api.the-odds-api.com/v4/sports/basketball_nba/events/{EVENT_ID}/odds/?apiKey={API_KEY}&regions=us&markets=h2h
 
 To do:
--add a sidebar for a multitude of sports that the odds api has and supports
--link those pages to the respective sports endpoints and have api calls for those sports and their respective pages
--add live scores (look at api docs for endpoints)
--connect supabase auth and database
--add login system and respective tables
--add favorite system/watchlist so that they have their own tailored page and some alerting
+-background cache infrastructure to save api credits, something like where we only have one goroutine, and the cache is only refreshed if at least one websocket client is connected (check notes)
+-highlight the "best" odd with some radiating effect for each game from each sports book
 
 More advanced features in future:
--background cache, where we have only one goroutine, and the cache is only refreshed if at least one websocket client is connected
+-live scores if it doesnt consume too many credits
+-alert on line movement
 -ai features (open ai api to start but then add in some of my own modeling stuff)
-
-refine:
--getting live scores/how we handle search bar data
--extra frontend refinement later (CLEAN UP SIDEBAR MESS AND FOR SPORT PAGES DISPLAY THE DATE ON THE CARDS as well)
--look at frontend readme notes
-
-add live icons on the respective sports pages too not just on home page
+-arbitrage betting
+-could add account features of tracking odds taken over time
 
 Infrastructure:
 Supabase Auth for accounts
 Supabase Postgres for favorites
-Go backend for odds/data API logic
+Go backend for odds/data API logic (will expand with goroutine and cache)
 Next.js frontend for UI
-
-could add account features of tracking odds taken over time

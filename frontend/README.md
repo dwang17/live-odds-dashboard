@@ -36,18 +36,13 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 
-UI Notes to add/refine:
-get rid of live icons and change screen so it says top UPCOMING favorites/underdogs
-
-Auth refinements:
+Potential Auth refinements:
 -add a small banner/toast when a user is verified and logged in for first time
+-redirect to watchlist page when user is logged in and access the page to show personalization
 
-Next Steps:
--make a watchlist/favorites table in supabase and let users choose and select favorite leagues and stuff. then make a watchlist page that if the user is logged in they see a personalized page with their watchlisted league odds
 
-done but should refine later:
+
+optional: done but should refine later with potential endpoint:
 -Keep games that are going on right now/have already commenced, but add a live icon for these
 games (refine to use an endpoint to verify data live later?)
--In addition, eventually add live scores of these games using a diff endpoint
--Change to top UPCOMING favorites (don't show if past commence time or use endpoint to check if game has gone live later?)
 

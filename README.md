@@ -51,6 +51,7 @@ https://api.the-odds-api.com/v4/sports/basketball_nba/events/{EVENT_ID}/odds/?ap
 
 To do:
 -background cache infrastructure to save api credits, something like where we only have one goroutine, and the cache is only refreshed if at least one websocket client is connected (check notes)
+-rate limiting
 -highlight the "best" odd with some radiating effect for each game from each sports book
 
 More advanced features in future:

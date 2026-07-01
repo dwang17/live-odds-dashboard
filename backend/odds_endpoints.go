@@ -132,11 +132,6 @@ func fetchSportPayload(sportKey string) (OddsPayload, error) {
 	return payload, nil
 }
 
-// fetchUpcomingPayload is the original homepage data fetcher and returns upcoming odds.
-func fetchUpcomingPayload() (OddsPayload, error) {
-	return fetchSportPayload("upcoming")
-}
-
 func fetchSportsList() ([]ApiSport, error) {
 	apiKey := os.Getenv("ODDS_API_KEY")
 	url := fmt.Sprintf("https://api.the-odds-api.com/v4/sports/?apiKey=%s", apiKey)

@@ -51,6 +51,7 @@ https://api.the-odds-api.com/v4/sports/basketball_nba/events/{EVENT_ID}/odds/?ap
 
 To do:
 -background cache infrastructure to save api credits, something like where we only have one goroutine, and the cache is only refreshed if at least one websocket client is connected (check notes)
+-rate limiting
 -highlight the "best" odd with some radiating effect for each game from each sports book
 
 More advanced features in future:
@@ -65,3 +66,19 @@ Supabase Auth for accounts
 Supabase Postgres for favorites
 Go backend for odds/data API logic (will expand with goroutine and cache)
 Next.js frontend for UI
+
+Application Flow:
+1. Frontend connects to /ws?sport={sport_key}
+2. wsHandler marks sport_key accessed
+3. registers connection in clientsBySport
+4. getCachedOdds checks cache
+5. fresh cache: return immediately
+6. stale/missing cache: fetch once with singleflight
+7. send payload to frontend
+
+Seperately:
+1. refresh goroutine runs every 1 minute
+2. finds sports accessed within last 2 hours
+3. calls getCachedOdds
+4. if stale, fetches fresh data
+5. broadcasts payload to connected clients for that sport

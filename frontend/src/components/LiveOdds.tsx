@@ -45,7 +45,7 @@ export default function LiveOdds() {
   const [topOdds, setTopOdds] = useState<OddsBet[]>([]);
   const [events, setEvents] = useState<EventOdds[]>([]);
   const [status, setStatus] = useState("connecting");
-
+  //fix state bug later
   useEffect(() => {
     const socket = new WebSocket(WS_URL);
 

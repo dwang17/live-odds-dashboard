@@ -62,6 +62,7 @@ func broadcastToSport(sportKey string, payload OddsPayload) {
 	clientsMu.Lock()
 	defer clientsMu.Unlock()
 
+	// iterate over the set of clients for the sport key and send the payload to each client
 	for conn := range clientsBySport[sportKey] {
 		err := conn.WriteJSON(payload)
 		if err != nil {

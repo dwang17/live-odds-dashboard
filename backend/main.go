@@ -111,6 +111,8 @@ func main() {
 	http.HandleFunc("/ws", wsHandler)
 	http.HandleFunc("/sports", corsMiddleware(sportsHandler))
 
+	startRefreshLoop()
+
 	log.Println("Server running on :8080")
 
 	err = http.ListenAndServe(":8080", nil)

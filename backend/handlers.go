@@ -13,6 +13,8 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		sport = "upcoming"
 	}
 
+	log.Println("WS connecting:", sport)
+
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
@@ -22,7 +24,13 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 	markSportAccessed(sport)
 	registerClient(sport, conn)
-	defer unregisterClient(sport, conn)
+
+	log.Println("WS connected:", sport)
+
+	defer func() {
+		unregisterClient(sport, conn)
+		log.Println("WS disconnected:", sport)
+	}()
 
 	payload, err := getCachedOdds(sport)
 	if err != nil {
@@ -31,12 +39,12 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := conn.WriteJSON(payload); err != nil {
+		log.Println("WS initial write error:", err)
 		log.Println(err)
 		return
 	}
 
-	//loop keeps the connection open and listens for messages from the client, but we don't expect any messages from the client in this case
-	//therefore since we are blocked while waiting for the client message that never comes, we can just break the loop and close the connection when the client disconnects
+	//client stays connected until a disconnect occurs and is detected by the socket
 	for {
 		if _, _, err := conn.ReadMessage(); err != nil {
 			break

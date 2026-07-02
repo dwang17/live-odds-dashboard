@@ -82,3 +82,17 @@ Seperately:
 3. calls getCachedOdds
 4. if stale, fetches fresh data
 5. broadcasts payload to connected clients for that sport
+
+
+Diagram:
+Main server
+│
+├── Handles HTTP/WebSocket requests
+│
+└── Background goroutine
+      Every 1 minute:
+      • Look for active sports
+      • Refresh stale cache
+      • Broadcast updates
+
+The goroutine is a background worker that periodically refreshes stale cache entries and pushes fresh odds to connected WebSocket clients without waiting for user requests

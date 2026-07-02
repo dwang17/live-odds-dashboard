@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import TodayGamesSection from "@/components/TodayGamesSection";
 import { EventOdds, OddsPayload } from "@/types/odds";
 
+const WS_URL = process.env.NEXT_PUBLIC_ODDS_WS_URL ?? "ws://localhost:8080/ws";
+
 interface SportOddsPageProps {
   sportKey: string;
   sportTitle: string;
@@ -17,32 +19,44 @@ export default function SportOddsPage({
 }: SportOddsPageProps) {
   const [events, setEvents] = useState<EventOdds[]>([]);
   const [status, setStatus] = useState("loading");
-
+  //fix state bug later
   useEffect(() => {
-    async function fetchSportOdds() {
+    const socket = new WebSocket(
+      `${WS_URL}?sport=${encodeURIComponent(sportKey)}`,
+    );
+
+    socket.onopen = () => {
+      setStatus("live");
+    };
+
+    socket.onmessage = (event) => {
       try {
-        setStatus("loading");
+        const data = JSON.parse(event.data) as OddsPayload;
 
-        const response = await fetch(
-          `http://localhost:8080/odds?sport=${sportKey}`
-        );
-
-        if (!response.ok) {
-          setStatus("error");
-          return;
-        }
-
-        const data = (await response.json()) as OddsPayload;
-
-        setEvents(data.events);
-        setStatus("loaded");
+        setEvents(data.events ?? []);
       } catch (error) {
-        console.error(error);
+        console.error("Failed to parse odds payload:", error);
         setStatus("error");
       }
-    }
+    };
 
-    fetchSportOdds();
+    socket.onerror = () => {
+      setStatus("error");
+    };
+
+    socket.onclose = () => {
+      setStatus((prev) => {
+        if (prev === "live") {
+          return "disconnected";
+        }
+
+        return "closed";
+      });
+    };
+
+    return () => {
+      socket.close();
+    };
   }, [sportKey]);
 
   return (
@@ -65,9 +79,7 @@ export default function SportOddsPage({
 
         {status === "loading" && (
           <div className="rounded-2xl border border-slate-400 bg-white p-8">
-            <p className="text-slate-600">
-              Loading {sportTitle} odds...
-            </p>
+            <p className="text-slate-600">Loading {sportTitle} odds...</p>
           </div>
         )}
 

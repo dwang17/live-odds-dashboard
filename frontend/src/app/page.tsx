@@ -7,7 +7,7 @@ export default function HomePage() {
         <h1 className="text-5xl font-bold">Today&apos;s Top Odds</h1>
 
         <p className="mt-4 text-xl font-bold">
-          Live odds updating in real time
+          A wide array of various league odds from multiple bookmakers, at your service
         </p>
 
         <div className="mt-12">

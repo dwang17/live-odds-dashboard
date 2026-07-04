@@ -1,6 +1,8 @@
 # live-odds-dashboard
 Realtime sports odds analytics platform
 
+**DISCLAIMER: Current State of Application has up to date data but is not fully "live" and only updates periodically on the page without refresh due to limited free API credits**
+
 Motivation:
 Current sports dashboards are either extremely hard to navigate or provide sportsbooks that are unknown/sketchy and don't show the heaviest favorites/underdogs
 

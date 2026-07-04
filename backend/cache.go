@@ -24,9 +24,9 @@ var (
 	refreshGroup singleflight.Group
 
 	//how long the cache is considered valid before a refresh is needed
-	cacheTTL = 30 * time.Minute
+	// cacheTTL = 30 * time.Minute
 	//may need to use this in production to save api credits lol
-	// cacheTTL = 2 * time.Hour
+	cacheTTL = 2 * time.Hour
 	// how long the cache is considered active before it can be evicted (cases of deleted unsued entries)
 	activeWindow = 2 * time.Hour
 )

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import TodayGamesSection from "@/components/TodayGamesSection";
 import { EventOdds, OddsPayload } from "@/types/odds";
 
-const WS_URL = process.env.NEXT_PUBLIC_ODDS_WS_URL ?? "ws://localhost:8080/ws";
+const WS_URL = process.env.NEXT_PUBLIC_ODDS_WS_URL;
 
 interface SportOddsPageProps {
   sportKey: string;
@@ -19,14 +19,16 @@ export default function SportOddsPage({
 }: SportOddsPageProps) {
   const [events, setEvents] = useState<EventOdds[]>([]);
   const [status, setStatus] = useState("loading");
-  //fix state bug later
+
   useEffect(() => {
+    setStatus("loading");
+
     const socket = new WebSocket(
-      `${WS_URL}?sport=${encodeURIComponent(sportKey)}`,
+      `${WS_URL}?sport=${encodeURIComponent(sportKey)}`
     );
 
     socket.onopen = () => {
-      setStatus("live");
+      console.log("Sport WS connected:", sportKey);
     };
 
     socket.onmessage = (event) => {
@@ -34,6 +36,7 @@ export default function SportOddsPage({
         const data = JSON.parse(event.data) as OddsPayload;
 
         setEvents(data.events ?? []);
+        setStatus("loaded");
       } catch (error) {
         console.error("Failed to parse odds payload:", error);
         setStatus("error");
@@ -41,22 +44,15 @@ export default function SportOddsPage({
     };
 
     socket.onerror = () => {
+      console.error("Sport WS error:", sportKey);
       setStatus("error");
     };
 
     socket.onclose = () => {
-      setStatus((prev) => {
-        if (prev === "live") {
-          return "disconnected";
-        }
-
-        return "closed";
-      });
+      console.log("Sport WS disconnected:", sportKey);
     };
 
-    return () => {
-      socket.close();
-    };
+    return () => socket.close();
   }, [sportKey]);
 
   return (

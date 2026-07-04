@@ -44,13 +44,17 @@ function getBiggestUnderdogPerPick(odds: OddsBet[]): OddsBet[] {
 export default function LiveOdds() {
   const [topOdds, setTopOdds] = useState<OddsBet[]>([]);
   const [events, setEvents] = useState<EventOdds[]>([]);
-  const [status, setStatus] = useState("connecting");
-  //fix state bug later
+  const [status, setStatus] = useState("loading");
+
   useEffect(() => {
-    const socket = new WebSocket(WS_URL);
+    setStatus("loading");
+
+    const socket = new WebSocket(
+      `${WS_URL}?sport=${encodeURIComponent("upcoming")}`
+    );
 
     socket.onopen = () => {
-      setStatus("live");
+      console.log("Upcoming WS connected");
     };
 
     socket.onmessage = (event) => {
@@ -59,6 +63,7 @@ export default function LiveOdds() {
 
         setTopOdds(data.topOdds ?? []);
         setEvents(data.events ?? []);
+        setStatus("loaded");
       } catch (error) {
         console.error("Failed to parse odds payload:", error);
         setStatus("error");
@@ -66,22 +71,15 @@ export default function LiveOdds() {
     };
 
     socket.onerror = () => {
+      console.error("Upcoming WS error");
       setStatus("error");
     };
 
     socket.onclose = () => {
-      setStatus((prev) => {
-        if (prev === "live") {
-          return "disconnected";
-        }
-
-        return "closed";
-      });
+      console.log("Upcoming WS disconnected");
     };
 
-    return () => {
-      socket.close();
-    };
+    return () => socket.close();
   }, []);
 
   //filter to show top upcoming odds for today (otherwise if the game is live it can be heavily skewed)
@@ -153,13 +151,11 @@ export default function LiveOdds() {
       {events.length > 0 && <TodayGamesSection events={events} />}
 
       <p className="text-sm text-slate-600">
-        {status === "live"
-          ? "Live backend odds streaming via websocket."
-          : status === "connecting"
-            ? "Connecting to backend websocket..."
-            : status === "error"
-              ? "Unable to connect to backend. Check backend is running at ws://localhost:8080/ws."
-              : "Backend connection closed."}
+        {status === "loading"
+          ? "Connecting to backend websocket..."
+          : status === "error"
+            ? "Unable to connect to backend. Check backend is running."
+            : "Odds updating live."}
       </p>
     </section>
   );

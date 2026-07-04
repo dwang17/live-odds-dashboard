@@ -62,12 +62,16 @@ export default function WatchlistLiveClient({
             };
 
             socket.onerror = () => {
-                console.error("Watchlist WS error:", league.sport_key);
-                setStatus("error");
+                console.debug("Watchlist WS error event:", league.sport_key);
             };
 
             socket.onclose = () => {
-                console.log("Watchlist WS disconnected:", league.sport_key);
+                if (!loadedSports.has(league.sport_key)) {
+                    setStatus("error");
+                    return;
+                }
+
+                console.debug("Watchlist WS closed after data loaded:", league.sport_key);
             };
         });
 

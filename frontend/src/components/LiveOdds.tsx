@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import OddsCard from "@/components/OddsCard";
 import TodayGamesSection from "@/components/TodayGamesSection";
 import { EventOdds, OddsBet, OddsPayload } from "@/types/odds";
@@ -45,8 +45,10 @@ export default function LiveOdds() {
   const [topOdds, setTopOdds] = useState<OddsBet[]>([]);
   const [events, setEvents] = useState<EventOdds[]>([]);
   const [status, setStatus] = useState("loading");
+  const hasLoadedOnce = useRef(false);
 
   useEffect(() => {
+    hasLoadedOnce.current = false;
     setStatus("loading");
 
     const socket = new WebSocket(
@@ -63,6 +65,7 @@ export default function LiveOdds() {
 
         setTopOdds(data.topOdds ?? []);
         setEvents(data.events ?? []);
+        hasLoadedOnce.current = true;
         setStatus("loaded");
       } catch (error) {
         console.error("Failed to parse odds payload:", error);
@@ -71,12 +74,16 @@ export default function LiveOdds() {
     };
 
     socket.onerror = () => {
-      console.error("Upcoming WS error");
-      setStatus("error");
+      console.debug("Upcoming WS error event");
     };
 
     socket.onclose = () => {
-      console.log("Upcoming WS disconnected");
+      if (!hasLoadedOnce.current) {
+        setStatus("error");
+        return;
+      }
+
+      console.debug("WS closed after data loaded");
     };
 
     return () => socket.close();

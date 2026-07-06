@@ -111,6 +111,10 @@ func main() {
 
 	http.HandleFunc("/ws", wsHandler)
 	http.HandleFunc("/sports", corsMiddleware(sportsHandler))
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
 
 	startRefreshLoop()
 

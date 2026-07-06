@@ -8,7 +8,7 @@ export interface SportConfig {
   has_outrights: boolean;
 }
 
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8080";
+const backendUrl = "http://localhost:8080";
 
 function filterSports(sports: SportConfig[]) {
   return sports.filter((sport) => {

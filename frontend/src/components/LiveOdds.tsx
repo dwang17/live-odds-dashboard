@@ -5,7 +5,7 @@ import OddsCard from "@/components/OddsCard";
 import TodayGamesSection from "@/components/TodayGamesSection";
 import { EventOdds, OddsBet, OddsPayload } from "@/types/odds";
 
-const WS_URL = process.env.NEXT_PUBLIC_ODDS_WS_URL ?? "ws://localhost:8080/ws";
+const WS_URL = "ws://localhost:8080/ws";
 
 //function that returns the strongest favorite for each unique pick (event + team + market)
 function getStrongestFavoritePerPick(odds: OddsBet[]): OddsBet[] {

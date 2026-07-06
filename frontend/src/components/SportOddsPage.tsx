@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import TodayGamesSection from "@/components/TodayGamesSection";
 import { EventOdds, OddsPayload } from "@/types/odds";
 
-const WS_URL = process.env.NEXT_PUBLIC_ODDS_WS_URL ?? "ws://localhost:8080/ws";
+const WS_URL = "ws://localhost:8080/ws";
 
 interface SportOddsPageProps {
   sportKey: string;

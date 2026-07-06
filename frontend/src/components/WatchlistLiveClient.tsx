@@ -5,7 +5,7 @@ import EventOddsCard from "@/components/EventOddsCard";
 import { EventOdds, OddsPayload } from "@/types/odds";
 import { WatchlistLeague } from "@/app/watchlist/page";
 
-const WS_BASE = process.env.NEXT_PUBLIC_ODDS_WS_URL ?? "ws://localhost:8080/ws";
+const WS_BASE = "ws://localhost:8080/ws";
 
 interface WatchlistLiveClientProps {
     leagues: WatchlistLeague[];

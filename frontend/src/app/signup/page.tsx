@@ -56,9 +56,6 @@ export default function SignUpPage() {
 
   return (
     <main className="min-h-screen mt-30 bg-gray-50 px-6 py-10">
-      <Link href="/" className="text-3xl font-bold text-red-600">
-        OddsRadar
-      </Link>
 
       <section className="mx-auto mt-10 max-w-xl rounded-xl border border-gray-200 bg-white px-12 py-14 shadow-sm">
         <p className="text-gray-400">Create your account</p>

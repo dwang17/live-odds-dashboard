@@ -33,7 +33,7 @@ export default function RootLayout({
         <Navbar />
         <div className="flex">
           <Sidebar />
-          <div className="flex-1">{children}</div>
+          <div className="flex-1 pl-20 transition-all">{children}</div>
         </div>
       </body>
     </html>
